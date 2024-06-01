@@ -9,12 +9,14 @@ services:
       - POSTGRES_PASSWORD=postgres
   web:
     build: .
-    command: -m gunicorn -c gunicorn.conf.py --reload
+    # command: -m gunicorn -c gunicorn.conf.py --reload
+    command: manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
     ports:
       - "8000:8000"
     environment:
+      - PORT:8000
       - DEBUG=True
       - POSTGRES_NAME=postgres
       - POSTGRES_USER=postgres

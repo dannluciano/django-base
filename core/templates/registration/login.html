@@ -1,0 +1,59 @@
+{% extends 'core/base.html' %}
+{% block content %}
+  <h1 class="title">Entrar</h1>
+
+  {% if form.errors %}
+    <article id="error-section" class="message is-danger">
+      <div class="message-header">Erro de Autenticação</div>
+      <div class="message-body">
+        <p>Nome de Usuário e/ou Senha Invalidos!</p>
+      </div>
+    </article>
+  {% endif %}
+
+  {% if next %}
+    {% if user.is_authenticated %}
+      <p>Your account doesn't have access to this page. To proceed, please login with an account that has access.</p>
+    {% else %}
+      <p>Please login to see this page.</p>
+    {% endif %}
+  {% endif %}
+
+  <form id="signin-form" action="{% url 'login' %}" method="post">
+    {% csrf_token %}
+    <div class="field">
+      <label class="label is-large">Nome de Usuário:</label>
+      <div class="control">
+        <input id="username-field" name="username" class="input is-large" type="text" placeholder="dannluciano" required />
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label is-large">Senha:</label>
+      <div class="control">
+        <input id="password-field" name="password" class="input is-large" type="password" required />
+      </div>
+    </div>
+
+    <div class="buttons"></div>
+
+    <div class="field is-grouped">
+      <p class="control">
+        <button class="button is-large is-success">Entrar</button>
+      </p>
+      <p class="control">
+        <a href="{% url 'password_reset' %}" id="resert-password-button" class="button is-large is-warning is-hidden" role="button">Mudar Senha</a>
+      </p>
+    </div>
+
+    <hr />
+
+    <input type="hidden" name="next" value="{{ next }}" />
+
+    <div class="buttons">
+      <a href="{% url 'signup' %}" role="link" class="button is-large is-info">Criar uma nova Conta</a>
+
+      <a href="#" role="button" class="button is-large" onclick="history.back()">Voltar</a>
+    </div>
+  </form>
+{% endblock %}
