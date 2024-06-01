@@ -1,2 +1,2 @@
 docker compose run web manage.py migrate
-docker compose run web manage.py loaddata core/seed.json
+docker compose run web manage.py loaddata seeds.json
