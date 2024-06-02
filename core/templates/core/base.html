@@ -37,6 +37,7 @@
           <div class="navbar-end">
             <div class="navbar-item">
               <div class="buttons">
+                <button id="theme-switcher" class="button">Light</button>
                 {% if user.is_authenticated %}
                   <form action="{% url 'logout' %}" method="post">
                     {% csrf_token %}
@@ -61,6 +62,7 @@
       </div>
     </section>
 
+    <script src="{% static 'js/bulma.js' %}"></script>
     {% block js %}
 
     {% endblock %}
