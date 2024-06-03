@@ -38,6 +38,9 @@
             <div class="navbar-item">
               <div class="buttons">
                 <button id="theme-switcher" class="button">Light</button>
+                {% if user.is_staff %}
+                  <a class="button is-primary" href="{% url 'admin:index' %}">🏬 Administração</a>
+                {% endif %}
                 {% if user.is_authenticated %}
                   <form action="{% url 'logout' %}" method="post">
                     {% csrf_token %}
