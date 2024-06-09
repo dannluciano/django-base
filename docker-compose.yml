@@ -18,8 +18,7 @@ services:
     environment:
       - PORT:8000
       - DEBUG=True
-      - POSTGRES_NAME=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+
     depends_on:
       - db

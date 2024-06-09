@@ -4,19 +4,16 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PORT 8000
 
-RUN <<EOF
-apk update
-apk add git
-apk add gcc
-apk add musl-dev
-apk add libffi-dev
-EOF
+RUN apk update && \
+    apk add git gcc musl-dev libffi-dev
 
 WORKDIR /app 
 
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt --no-cache-dir
 COPY . . 
+
+RUN python3 manage.py collectstatic --no-input
 
 EXPOSE ${PORT}  
 ENTRYPOINT ["python3"]

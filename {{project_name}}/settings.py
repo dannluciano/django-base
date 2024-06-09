@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 
+import dj_database_url
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -89,16 +90,10 @@ DATABASES = {
     }
 }
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("POSTGRES_NAME"),
-        "USER": config("POSTGRES_USER"),
-        "PASSWORD": config("POSTGRES_PASSWORD"),
-        "HOST": "db",
-        "PORT": 5432,
-    }
-}
+DATABASES["default"] = dj_database_url.config(
+    conn_max_age=600,
+    conn_health_checks=True,
+)
 
 
 # Password validation
@@ -235,10 +230,10 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
 EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", default=10, cast=int)
-EMAIL_HOST = config("EMAIL_HOST")
-EMAIL_HOST_USER = config("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
+EMAIL_HOST = config("EMAIL_HOST", default="smtp.mailgun.org")
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="user")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="password")
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="user@email.com")
 
 if DEBUG:
     INSTALLED_APPS += [
