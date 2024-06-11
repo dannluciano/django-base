@@ -235,6 +235,9 @@ EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="user")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="password")
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="user@email.com")
 
+TASKS = {"default": {"BACKEND": "django_tasks.backends.immediate.ImmediateBackend"}}
+
+
 if DEBUG:
     INSTALLED_APPS += [
         "debug_toolbar",
