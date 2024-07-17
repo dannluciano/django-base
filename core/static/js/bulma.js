@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+function setupTheme() {
 	// THEMES
 	const STORAGE_KEY = "bulma-theme";
 	const SYSTEM_THEME = "system";
@@ -105,4 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			state.OSTheme = theme;
 			setTheme(theme);
 		});
-});
+}
+
+document.addEventListener("DOMContentLoaded", setupTheme);
+document.body.addEventListener("htmx:afterSwap", setupTheme);

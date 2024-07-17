@@ -8,6 +8,7 @@ Django==5.0.6
 django-debug-toolbar==4.4.2
 django-stubs-ext==5.0.2
 django-tasks==0.3.0
+django-htmx==1.18.0
 gunicorn==22.0.0
 packaging==24.0
 psycopg==3.1.19
