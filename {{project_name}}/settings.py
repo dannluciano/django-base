@@ -39,6 +39,7 @@ ALLOWED_HOSTS = [
 
 INSTALLED_APPS = [
     "core",
+    "django_tasks.backends.database",
     "django_htmx",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -236,6 +237,9 @@ EMAIL_HOST = config("EMAIL_HOST", default="smtp.mailgun.org")
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="user")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="password")
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="user@email.com")
+
+TASKS = {"default": {"BACKEND": "django_tasks.backends.database.DatabaseBackend"}}
+
 
 if DEBUG:
     INSTALLED_APPS += [

@@ -22,3 +22,15 @@ services:
 
     depends_on:
       - db
+
+  worker:
+    build: .
+    command: manage.py db_worker
+    volumes:
+      - .:/app
+    environment:
+      - DEBUG=True
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+
+    depends_on:
+      - db
