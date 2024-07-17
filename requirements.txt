@@ -6,6 +6,7 @@ cffi==1.16.0
 dj-database-url==2.2.0
 Django==5.0.6
 django-debug-toolbar==4.4.2
+django-htmx==1.18.0
 gunicorn==22.0.0
 packaging==24.0
 psycopg==3.1.19
