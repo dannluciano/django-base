@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     "core",
     "django_tasks.backends.database",
     "django_htmx",
+    "crispy_forms",
+    "crispy_bulma",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -226,6 +228,12 @@ LOGGING = {
             "level": "INFO",
             "propagate": False,
         },
+        "django_tasks.backends.database.db_worker": {
+            "handlers": [
+                "console",
+            ],
+            "level": "INFO",
+        },
     },
 }
 
@@ -240,8 +248,13 @@ DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="user@email.com")
 
 TASKS = {"default": {"BACKEND": "django_tasks.backends.database.DatabaseBackend"}}
 
+CRISPY_ALLOWED_TEMPLATE_PACKS = ("bulma",)
+
+CRISPY_TEMPLATE_PACK = "bulma"
 
 if DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
     INSTALLED_APPS += [
         "debug_toolbar",
     ]
