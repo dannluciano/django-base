@@ -2,7 +2,9 @@ from django.contrib.auth import login
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
-from .forms import UserCreationForm
+from core.tasks import send_email
+
+from .forms import ContactForm, UserCreationForm
 
 
 def home(request):
@@ -21,6 +23,33 @@ def about(request):
         base_template = "base.html"
     context = {"base_template": base_template}
     return render(request, "core/about.html", context)
+
+
+def contact(request):
+    if request.htmx:
+        base_template = "main.html"
+    else:
+        base_template = "base.html"
+
+    form = ContactForm()
+    context = {"base_template": base_template, "form": form}
+
+    if request.POST:
+        form = ContactForm(request.POST)
+        context["form"] = form
+        if form.is_valid():
+            sender_name = form.cleaned_data["sender_name"]
+            sender_email = form.cleaned_data["sender_email"]
+            subject = form.cleaned_data["subject"]
+            message = form.cleaned_data["message"]
+
+            send_email.enqueue(subject, message, sender_name, sender_email)
+
+            return redirect(reverse("contact"))
+        else:
+            return render(request, "core/contact.html", context)
+    else:
+        return render(request, "core/contact.html", context)
 
 
 def signup(request):

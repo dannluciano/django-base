@@ -1,0 +1,22 @@
+{% extends base_template %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <h1 class="title">Contato</h1>
+
+  <form action="{% url 'contact' %}" method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <div class="field is-grouped">
+      <p class="control">
+        <button class="button is-large is-success">Enviar Mensagem</button>
+      </p>
+      <p class="control">
+        <button class="button is-large is-warning" type="reset">Limpar</button>
+      </p>
+      <p class="control">
+        <a href="#" role="button" class="button is-large" onclick="history.back()">Voltar</a>
+      </p>
+    </div>
+  </form>
+{% endblock %}
