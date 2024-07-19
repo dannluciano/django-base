@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth import login
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -44,6 +45,9 @@ def contact(request):
             message = form.cleaned_data["message"]
 
             send_email.enqueue(subject, message, sender_name, sender_email)
+            messages.add_message(
+                request, messages.SUCCESS, "Obrigado pela sua mensagem."
+            )
 
             return redirect(reverse("contact"))
         else:

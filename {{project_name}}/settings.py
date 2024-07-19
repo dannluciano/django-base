@@ -14,6 +14,7 @@ from pathlib import Path
 
 import dj_database_url
 from decouple import config
+from django.contrib.messages import constants as messages
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -251,6 +252,15 @@ TASKS = {"default": {"BACKEND": "django_tasks.backends.database.DatabaseBackend"
 CRISPY_ALLOWED_TEMPLATE_PACKS = ("bulma",)
 
 CRISPY_TEMPLATE_PACK = "bulma"
+
+
+MESSAGE_TAGS = {
+    messages.DEBUG: "",
+    messages.INFO: "is-info",
+    messages.SUCCESS: "is-success",
+    messages.WARNING: "is-warning",
+    messages.ERROR: "is-danger",
+}
 
 if DEBUG:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

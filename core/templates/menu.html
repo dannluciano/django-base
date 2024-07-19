@@ -39,3 +39,19 @@
     </div>
   </nav>
 </section>
+
+<section class="container">
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li>
+          <article class="message {% if message.tags %}
+              {{ message.tags }}
+            {% endif %}">
+            <div class="message-body">{{ message }}</div>
+          </article>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</section>
