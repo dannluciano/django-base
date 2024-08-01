@@ -1,7 +1,7 @@
 <section id="menubar" class="container">
   <nav class="navbar" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-      <a class="navbar-item" hx-get="{% url 'home' %}" hx-target="main" hx-indicator="loader" hx-push-url="true" href="{% url 'home' %}">Site</a>
+      <a class="navbar-item" hx-get="{% url 'home' %}" hx-target="main" hx-indicator="loader" hx-push-url="true" hx-swap="morph" href="{% url 'home' %}">Site</a>
 
       <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
         <span aria-hidden="true"></span>
@@ -13,8 +13,8 @@
 
     <div id="navbarBasicExample" class="navbar-menu">
       <div class="navbar-start">
-        <a hx-get="{% url 'about' %}" hx-target="main" hx-indicator="loader" hx-push-url="true" href="{% url 'about' %}" class="navbar-item">Sobre</a>
-        <a hx-get="{% url 'contact' %}" hx-target="main" hx-indicator="loader" hx-push-url="true" href="{% url 'contact' %}" class="navbar-item">Contato</a>
+        <a hx-get="{% url 'about' %}" hx-target="main" hx-indicator="loader" hx-push-url="true" hx-swap="morph" href="{% url 'about' %}" class="navbar-item">Sobre</a>
+        <a hx-get="{% url 'contact' %}" hx-target="main" hx-indicator="loader" hx-push-url="true" hx-swap="morph" href="{% url 'contact' %}" class="navbar-item">Contato</a>
       </div>
 
       <div class="navbar-end">
@@ -30,7 +30,7 @@
                 <button class="button is-danger">Log Out</button>
               </form>
             {% else %}
-              <a class="button is-primary" hx-get="{% url 'signup' %}" hx-target="main" hx-indicator="loader" hx-push-url="true" href="{% url 'signup' %}"><strong>Sign up</strong></a>
+              <a class="button is-primary" hx-get="{% url 'signup' %}" hx-target="main" hx-indicator="loader" hx-push-url="true" hx-swap="morph" href="{% url 'signup' %}"><strong>Sign up</strong></a>
               <a class="button is-light" href="{% url 'login' %}">Log in</a>
             {% endif %}
           </div>

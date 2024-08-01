@@ -17,7 +17,10 @@
 
     {% endblock %}
   </head>
-  <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  <body hx-ext="morph" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <section style="display: flex; align-items: center; justify-content: center;">
+      <span id="loader" class="htmx-indicator loader"></span>
+    </section>
     <main id="main">
         
       {% include "menu.html" %}
@@ -32,9 +35,9 @@
     
     </main>
 
-    <span id="loader" class="htmx-indicator loader"></span>
-
     <script src="{% static 'vendor/htmx/htmx.min.js' %}" defer></script>
+    <script src="https://unpkg.com/idiomorph/dist/idiomorph-ext.min.js"></script>
+
     {% django_htmx_script %}
     <script src="{% static 'js/bulma.js' %}"></script>
     {% block js %}
