@@ -117,5 +117,19 @@ function setupTheme() {
 	}
 }
 
+function setupMenu() {
+	for (element of document.querySelectorAll(".navbar-burger")) {
+		element.addEventListener("click", (event) => {
+			event.target.classList.toggle("is-active");
+
+			for (navbarMenu of document.querySelectorAll(".navbar-menu")) {
+				navbarMenu.classList.toggle("is-active");
+			}
+		});
+	}
+}
+
 document.addEventListener("DOMContentLoaded", setupTheme);
 document.body.addEventListener("htmx:afterSwap", setupTheme);
+
+document.addEventListener("DOMContentLoaded", setupMenu);
