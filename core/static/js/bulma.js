@@ -120,11 +120,12 @@ function setupTheme() {
 function setupMenu() {
 	for (element of document.querySelectorAll(".navbar-burger")) {
 		element.addEventListener("click", (event) => {
-			event.target.classList.toggle("is-active");
-
-			for (navbarMenu of document.querySelectorAll(".navbar-menu")) {
-				navbarMenu.classList.toggle("is-active");
-			}
+			event.preventDefault();
+			const targetID = element.dataset.target;
+			const $target = document.getElementById(targetID);
+			element.classList.toggle("is-active");
+			$target.classList.toggle("is-active");
+			event.stopPropagation();
 		});
 	}
 }
