@@ -263,7 +263,7 @@ MESSAGE_TAGS = {
 }
 
 if DEBUG:
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
     INSTALLED_APPS += [
         "debug_toolbar",
