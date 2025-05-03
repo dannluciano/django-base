@@ -141,12 +141,19 @@ STATIC_ROOT = BASE_DIR / "assets"
 
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "storages.backends.s3.S3Storage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME", default="django-base")
+AWS_ACCESS_KEY_ID = config("AWS_S3_ACCESS_KEY_ID", default="aws_user")
+AWS_SECRET_ACCESS_KEY = config("AWS_S3_SECRET_ACCESS_KEY", default="aws_pass")
+AWS_S3_ENDPOINT_URL = config("AWS_S3_ENDPOINT_URL", default="http://localhost:9000")
+AWS_S3_URL_PROTOCOL = config("AWS_S3_URL_PROTOCOL", default="http:")
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

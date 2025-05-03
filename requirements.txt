@@ -19,3 +19,4 @@ python-decouple==3.8
 sqlparse==0.5.3
 typing_extensions==4.12.2
 whitenoise==6.8.2
+django-storages[s3]==1.14.6

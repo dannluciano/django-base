@@ -15,11 +15,8 @@ services:
       - .:/app
     ports:
       - "8000:8000"
-    environment:
-      - PORT:8000
-      - DEBUG=True
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
-
+    env_file:
+      - .env
     depends_on:
       - db
 
@@ -41,3 +38,19 @@ services:
     ports:
       - 1025:1025
       - 8025:8025
+
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    volumes:
+      - ./data/minio:/data
+    ports:
+     - 9000:9000
+     - 9001:9001
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
