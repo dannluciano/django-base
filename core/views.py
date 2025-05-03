@@ -1,3 +1,5 @@
+from functools import wraps
+
 from django.contrib import messages
 from django.contrib.auth import login
 from django.shortcuts import redirect, render
@@ -8,36 +10,34 @@ from core.tasks import send_email
 from .forms import ContactForm, UserCreationForm
 
 
+def with_template(view_func):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        context = view_func(request, *args, **kwargs)
+        if isinstance(context, dict):
+            context["base_template"] = "main.html" if request.htmx else "base.html"
+            return render(request, context.pop("template"), context)
+        return context
+
+    return wrapper
+
+
+@with_template
 def home(request):
-    if request.htmx:
-        base_template = "main.html"
-    else:
-        base_template = "base.html"
-    context = {"base_template": base_template}
-    return render(request, "core/home.html", context)
+    return {"template": "core/home.html"}
 
 
+@with_template
 def about(request):
-    if request.htmx:
-        base_template = "main.html"
-    else:
-        base_template = "base.html"
-    context = {"base_template": base_template}
-    return render(request, "core/about.html", context)
+    return {"template": "core/about.html"}
 
 
+@with_template
 def contact(request):
-    if request.htmx:
-        base_template = "main.html"
-    else:
-        base_template = "base.html"
-
     form = ContactForm()
-    context = {"base_template": base_template, "form": form}
 
     if request.POST:
         form = ContactForm(request.POST)
-        context["form"] = form
         if form.is_valid():
             sender_name = form.cleaned_data["sender_name"]
             sender_email = form.cleaned_data["sender_email"]
@@ -51,9 +51,9 @@ def contact(request):
 
             return redirect(reverse("contact"))
         else:
-            return render(request, "core/contact.html", context)
+            return {"template": "core/contact.html", "form": form}
     else:
-        return render(request, "core/contact.html", context)
+        return {"template": "core/contact.html", "form": form}
 
 
 def signup(request):
