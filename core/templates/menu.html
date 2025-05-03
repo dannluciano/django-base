@@ -23,6 +23,10 @@
             <button id="theme-switcher" class="button">Light</button>
             {% if user.is_staff %}
               <a class="button is-primary" href="{% url 'admin:index' %}">🏬 Administração</a>
+              {% if debug %}
+                <a class="button is-info" href="http://localhost:8025/" target="_blank">📧 MailHog</a>
+                <a class="button is-info" href="http://localhost:9001/" target="_blank">🖼️ Minio</a>
+              {% endif %}
             {% endif %}
             {% if user.is_authenticated %}
               <form action="{% url 'logout' %}" method="post">
