@@ -32,12 +32,20 @@ services:
     depends_on:
       - db
 
-  mailhog:
-    image: mailhog/mailhog:latest
-    restart: always
+  mail:
+    image: axllent/mailpit
+    container_name: mailpit
+    restart: unless-stopped
+    volumes:
+      - ./data:/data
     ports:
-      - 1025:1025
       - 8025:8025
+      - 1025:1025
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATABASE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
 
   minio:
     image: minio/minio
@@ -45,8 +53,8 @@ services:
     volumes:
       - ./data/minio:/data
     ports:
-     - 9000:9000
-     - 9001:9001
+      - 9000:9000
+      - 9001:9001
     env_file:
       - .env
     healthcheck:
