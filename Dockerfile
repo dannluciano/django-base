@@ -16,5 +16,9 @@ COPY . .
 RUN python3 manage.py collectstatic --no-input
 
 EXPOSE ${PORT}  
-ENTRYPOINT ["python3"]
-CMD ["-m", "gunicorn", "-c", "gunicorn.conf.py"]
+
+ADD docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod a+x /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+CMD ["python3", "-m", "gunicorn", "-c", "gunicorn.conf.py"]

@@ -10,7 +10,7 @@ services:
   web:
     build: .
     # command: -m gunicorn -c gunicorn.conf.py --reload
-    command: manage.py runserver 0.0.0.0:8000
+    command: python3 manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
     ports:
@@ -22,7 +22,7 @@ services:
 
   worker:
     build: .
-    command: manage.py db_worker
+    command: python3 manage.py db_worker
     volumes:
       - .:/app
     environment:
