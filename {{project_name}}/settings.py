@@ -40,6 +40,7 @@ ALLOWED_HOSTS = [
 
 INSTALLED_APPS = [
     "core",
+    "base",
     "django_tasks.backends.database",
     "django_htmx",
     "crispy_forms",
