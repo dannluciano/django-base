@@ -6,7 +6,9 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     # command: -m gunicorn -c gunicorn.conf.py --reload
     command: python3 manage.py runserver 0.0.0.0:8000
     volumes:
@@ -19,36 +21,32 @@ services:
       - db
 
   worker:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     command: python3 manage.py db_worker
     volumes:
       - .:/app
-    environment:
-      - DEBUG=True
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
-
+    env_file:
+      - .env
     depends_on:
       - db
 
   mail:
     image: axllent/mailpit
     restart: unless-stopped
-    volumes:
-      - ./data:/data
     ports:
       - 8025:8025
       - 1025:1025
     environment:
       MP_MAX_MESSAGES: 5000
-      MP_DATABASE: /data/mailpit.db
+      MP_DATABASE: mailpit.db
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
 
   minio:
     image: minio/minio
     command: server /data --console-address ":9001"
-    volumes:
-      - ./data/minio:/data
     ports:
       - 9000:9000
       - 9001:9001
