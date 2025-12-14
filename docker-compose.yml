@@ -1,8 +1,6 @@
 services:
   db:
     image: postgres
-    volumes:
-      - ./data/db:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=basedb
       - POSTGRES_USER=postgres
@@ -34,7 +32,6 @@ services:
 
   mail:
     image: axllent/mailpit
-    container_name: mailpit
     restart: unless-stopped
     volumes:
       - ./data:/data
