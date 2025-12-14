@@ -47,6 +47,8 @@ services:
   minio:
     image: minio/minio
     command: server /data --console-address ":9001"
+    volumes:
+      - data:/data
     ports:
       - 9000:9000
       - 9001:9001
@@ -57,3 +59,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+volumes:
+  data:
