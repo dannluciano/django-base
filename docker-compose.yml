@@ -19,6 +19,7 @@ services:
       - .env
     depends_on:
       - db
+      - minio
 
   worker:
     build:
@@ -31,6 +32,7 @@ services:
       - .env
     depends_on:
       - db
+      - minio
 
   mail:
     image: axllent/mailpit
