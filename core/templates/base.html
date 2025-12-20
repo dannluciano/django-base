@@ -16,6 +16,7 @@
     {% block css %}
 
     {% endblock %}
+    {% htmx_script %}
   </head>
   <body hx-ext="morph" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     <section style="display: flex; align-items: center; justify-content: center;">
@@ -35,10 +36,6 @@
     
     </main>
 
-    <script src="{% static 'vendor/htmx/htmx.min.js' %}" defer></script>
-    <script src="https://unpkg.com/idiomorph/dist/idiomorph-ext.min.js"></script>
-
-    {% django_htmx_script %}
     <script src="{% static 'js/bulma.js' %}"></script>
     {% block js %}
 
