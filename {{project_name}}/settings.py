@@ -41,6 +41,7 @@ ALLOWED_HOSTS = [
 INSTALLED_APPS = [
     "core",
     "base",
+    "extra_settings",
     "django_tasks.backends.database",
     "django_htmx",
     "crispy_forms",
@@ -261,6 +262,33 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = ("bulma",)
 
 CRISPY_TEMPLATE_PACK = "bulma"
 
+EXTRA_SETTINGS_ADMIN_APP = "extra_settings"
+
+EXTRA_SETTINGS_DEFAULTS = [
+    {
+        "name": "SITE_NAME",
+        "type": "string",
+        "value": "Django Base",
+    },
+]
+
+EXTRA_SETTINGS_ENFORCE_UPPERCASE_SETTINGS = True
+EXTRA_SETTINGS_FALLBACK_TO_CONF_SETTINGS = True
+EXTRA_SETTINGS_FILE_UPLOAD_TO = "settings/files"
+EXTRA_SETTINGS_IMAGE_UPLOAD_TO = "settings/images"
+
+EXTRA_SETTINGS_VERBOSE_NAME = "Configurações"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "TIMEOUT": 300,
+    },
+    "extra_settings": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "TIMEOUT": 60,
+    },
+}
 
 MESSAGE_TAGS = {
     messages.DEBUG: "",
