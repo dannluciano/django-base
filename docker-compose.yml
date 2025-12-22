@@ -15,6 +15,8 @@ services:
       - .:/app
     ports:
       - "8000:8000"
+    environment:
+      - APP=web
     env_file:
       - .env
     depends_on:
@@ -28,6 +30,8 @@ services:
     command: python3 manage.py db_worker
     volumes:
       - .:/app
+    environment:
+      - APP=worker
     env_file:
       - .env
     depends_on:
