@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
-    help = "Cria o bucket S3 se não existir"
+    help = "Create the S3 bucket if it doesn't already exist."
 
     def handle(self, *args, **options):
         s3 = boto3.client(
@@ -18,10 +18,10 @@ class Command(BaseCommand):
 
         try:
             s3.head_bucket(Bucket=settings.AWS_STORAGE_BUCKET_NAME)
-            self.stdout.write("Bucket já existe.")
+            self.stdout.write("Bucket already exists.")
         except ClientError:
             s3.create_bucket(
                 Bucket=settings.AWS_STORAGE_BUCKET_NAME,
                 CreateBucketConfiguration={"LocationConstraint": "django-base"},
             )
-            self.stdout.write("Bucket criado com sucesso.")
+            self.stdout.write("Bucket successfully created.")
