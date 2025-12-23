@@ -66,5 +66,22 @@ services:
       timeout: 5s
       retries: 5
 
+  devcontainer:
+    profiles:
+      - devcontainer
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/workspace:cached
+    command: sleep infinity
+    environment:
+      - APP=devcontainer
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - minio
+
 volumes:
   data:
