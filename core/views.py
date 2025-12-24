@@ -4,7 +4,6 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from extra_settings.models import Setting
 
 from core.tasks import send_email
 
@@ -15,7 +14,6 @@ def with_template(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         context = view_func(request, *args, **kwargs)
-        context["logo"] = Setting.get("SITE_LOGO")
         if isinstance(context, dict):
             context["base_template"] = "main.html" if request.htmx else "base.html"
             return render(request, context.pop("template"), context)
