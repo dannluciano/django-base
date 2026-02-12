@@ -3,7 +3,8 @@ Brotli==1.2.0
 crispy-bulma==0.12.0
 dj-database-url==3.0.1
 Django==6.0.0
-django-tasks==0.10.0
+django-tasks==0.12.0
+django-tasks-db==0.12.0
 django-htmx==1.27.0
 gunicorn==23.0.0
 psycopg==3.3.2

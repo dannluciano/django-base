@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     "core",
     "base",
     "extra_settings",
-    "django_tasks.backends.database",
+    "django_tasks",
+    "django_tasks_db",
     "django_htmx",
     "crispy_forms",
     "crispy_bulma",
@@ -256,7 +257,15 @@ EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="user")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="password")
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="user@email.com")
 
-TASKS = {"default": {"BACKEND": "django_tasks.backends.database.DatabaseBackend"}}
+TASKS = {
+    "default": {
+        "BACKEND": "django_tasks_db.DatabaseBackend",
+        "QUEUES": ["default"],
+        "OPTIONS": {
+            "id_function": "uuid.uuid7",
+        },
+    }
+}
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = ("bulma",)
 
