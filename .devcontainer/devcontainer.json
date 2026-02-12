@@ -3,7 +3,9 @@
     "dockerComposeFile": "../docker-compose.yml",
     "service": "devcontainer",
     "runServices": [
-        "devcontainer"
+        "devcontainer",
+        "web",
+        "worker"
     ],
     "workspaceFolder": "/workspace",
     "shutdownAction": "stopCompose",
