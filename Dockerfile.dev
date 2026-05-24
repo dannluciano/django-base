@@ -1,8 +1,8 @@
-FROM python:3.14.3-alpine3.23
-
+FROM python:3.14.5-alpine3.23
+            
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV PORT 8000
+ENV PORT=8000
 
 RUN apk update && \
     apk add git gcc musl-dev libffi-dev
