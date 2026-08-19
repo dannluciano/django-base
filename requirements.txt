@@ -12,3 +12,4 @@ python-decouple==3.8
 whitenoise==6.12.0
 django-storages[s3]==1.14.6
 django-extra-settings==0.14.1
+django-debug-toolbar
