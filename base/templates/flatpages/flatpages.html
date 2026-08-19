@@ -1,0 +1,9 @@
+<footer class="container">
+  <ul>
+    {% for page in flatpages %}
+      <li>
+        <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+</footer>

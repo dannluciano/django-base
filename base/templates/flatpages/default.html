@@ -37,13 +37,8 @@
         </section>
     
     </main>
-    <footer class="container">
-      <ul>
-        {% for page in flatpages %}
-          <li><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></li>
-        {% endfor %}
-      </ul>
-    </footer>
+        
+    {% include "flatpages/flatpages.html" %}
 
     <script src="{% static 'js/bulma.js' %}"></script>
     {% block js %}
