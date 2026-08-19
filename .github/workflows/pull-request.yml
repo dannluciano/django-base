@@ -1,0 +1,142 @@
+name: CI + Review App (Django/Dokku)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: review-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  DOKKU_HOST: ${{ secrets.DOKKU_HOST }}
+  DOKKU_USER: dokku
+  DOKKU_SSH_PORT: ${{ secrets.DOKKU_SSH_PORT || 22 }}
+  BASE_DOMAIN: casa.dannluciano.com.br
+  DATABASE_URL: postgres://postgres:postgres@localhost:5432/basedb
+  DJANGO_SETTINGS_MODULE: "{{project_name}}.settings.py"
+  SECRET_KEY: "E7V12gvEy7vkzJ3gGxE8x0lzAcHoc4WOdvgfkNd4ThA="
+  DEBUG: True
+
+jobs:
+  ci:
+    name: Django CI
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_DB: basedb
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d basedb"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14.5"
+          cache: pip
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.dev.txt ; elif [ -f pyproject.toml ]; then pip install .; else echo 'requirements.txt ou pyproject.toml não encontrado'; exit 1; fi
+      - name: Django system check
+        env:
+          DJANGO_SETTINGS_MODULE: ${{ vars.DJANGO_SETTINGS_MODULE || '{{project_name}}.settings' }}
+          SECRET_KEY: ci-only-secret-key
+        run: python manage.py check
+      - name: Django tests
+        env:
+          DJANGO_SETTINGS_MODULE: ${{ vars.DJANGO_SETTINGS_MODULE || '{{project_name}}.settings' }}
+          SECRET_KEY: ci-only-secret-key
+        run: python manage.py test
+      - name: Validate Docker image
+        run: docker build --pull -t base-ci .
+
+  review:
+    name: Deploy Review App
+    # needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Configure SSH
+        env:
+          DOKKU_SSH_KEY: ${{ secrets.DOKKU_SSH_KEY }}
+          DOKKU_KNOWN_HOSTS: ${{ secrets.DOKKU_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$DOKKU_SSH_KEY" > ~/.ssh/dokku_key
+          chmod 600 ~/.ssh/dokku_key
+          printf '%s\n' "$DOKKU_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+      - name: Compute names
+        id: review
+        env:
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          echo "app=base-pr-${PR}" >> "$GITHUB_OUTPUT"
+          echo "db=base-pr-${PR}-db" >> "$GITHUB_OUTPUT"
+          echo "domain=pr-${PR}.${BASE_DOMAIN}" >> "$GITHUB_OUTPUT"
+      - name: Create Dokku app and database
+        env:
+          APP: ${{ steps.review.outputs.app }}
+          DB: ${{ steps.review.outputs.db }}
+        run: |
+          SSH="ssh -i ~/.ssh/dokku_key -p $DOKKU_SSH_PORT -o StrictHostKeyChecking=yes"
+          $SSH "$DOKKU_USER@$DOKKU_HOST" "apps:create '$APP' 2>/dev/null || true"
+          $SSH "$DOKKU_USER@$DOKKU_HOST" "apps:exists '$APP'"
+          $SSH "$DOKKU_USER@$DOKKU_HOST" "postgres:create '$DB' || true"
+          $SSH "$DOKKU_USER@$DOKKU_HOST" "postgres:exists '$DB'"
+          $SSH "$DOKKU_USER@$DOKKU_HOST" "postgres:link '$DB' '$APP'"
+      - name: Configure Django/Dokku
+        env:
+          APP: ${{ steps.review.outputs.app }}
+          DOMAIN: ${{ steps.review.outputs.domain }}
+          DJANGO_SETTINGS_MODULE: ${{ vars.DJANGO_SETTINGS_MODULE || '{{project_name}}.settings' }}
+        run: |
+          SSH="ssh -i ~/.ssh/dokku_key -p $DOKKU_SSH_PORT -o StrictHostKeyChecking=yes"
+          $SSH "$DOKKU_USER@$DOKKU_HOST" "domains:set '$APP' '$DOMAIN'"
+          $SSH "$DOKKU_USER@$DOKKU_HOST" "config:set '$APP' DJANGO_SETTINGS_MODULE='$DJANGO_SETTINGS_MODULE' SECRET_KEY='$SECRET_KEY' DEBUG='$DEBUG' ALLOWED_HOSTS='$DOMAIN' CSRF_TRUSTED_ORIGINS='https://*.$BASE_DOMAIN' "
+          $SSH "$DOKKU_USER@$DOKKU_HOST" "config:set --no-restart '$APP' PR_NUMBER='${{ github.event.pull_request.number }}' PR_SHA='${{ github.event.pull_request.head.sha }}'"
+      - name: Deploy PR to Dokku
+        env:
+          APP: ${{ steps.review.outputs.app }}
+        run: |
+          git remote remove dokku 2>/dev/null || true
+          git remote add dokku "ssh://$DOKKU_USER@$DOKKU_HOST:$DOKKU_SSH_PORT/$APP"
+          GIT_SSH_COMMAND="ssh -i ~/.ssh/dokku_key -o StrictHostKeyChecking=yes" git push dokku "HEAD:main" --force
+      - name: Run migrations
+        env:
+          APP: ${{ steps.review.outputs.app }}
+        run: |
+          ssh -i ~/.ssh/dokku_key -p "$DOKKU_SSH_PORT" -o StrictHostKeyChecking=yes "$DOKKU_USER@$DOKKU_HOST" "run '$APP' python manage.py migrate --noinput"
+      - name: Load data from seeds
+        env:
+          APP: ${{ steps.review.outputs.app }}
+        run: |
+          ssh -i ~/.ssh/dokku_key -p "$DOKKU_SSH_PORT" -o StrictHostKeyChecking=yes "$DOKKU_USER@$DOKKU_HOST" "run '$APP' python manage.py loaddata seeds.json"
+      - name: Enable HTTPS
+        env:
+          APP: ${{ steps.review.outputs.app }}
+        run: |
+          ssh -i ~/.ssh/dokku_key -p "$DOKKU_SSH_PORT" -o StrictHostKeyChecking=yes "$DOKKU_USER@$DOKKU_HOST" "letsencrypt:enable '$APP' || true"
+      - name: Review URL
+        env:
+          DOMAIN: ${{ steps.review.outputs.domain }}
+        run: |
+          { echo '## 🚀 Django Review App'; echo; echo "**URL:** https://$DOMAIN"; echo; echo "Atualizado pelo PR #${{ github.event.pull_request.number }}."; } >> "$GITHUB_STEP_SUMMARY"
