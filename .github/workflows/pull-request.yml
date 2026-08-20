@@ -66,7 +66,7 @@ jobs:
 
   review:
     name: Deploy Review App
-    # needs: ci
+    needs: ci
     runs-on: ubuntu-latest
     steps:
       - name: Checkout PR
@@ -92,6 +92,7 @@ jobs:
           echo "app=base-pr-${PR}" >> "$GITHUB_OUTPUT"
           echo "db=base-pr-${PR}-db" >> "$GITHUB_OUTPUT"
           echo "domain=pr-${PR}.${BASE_DOMAIN}" >> "$GITHUB_OUTPUT"
+          echo "bucket_name"=base-pr-${PR} >> "$GITHUB_OUTPUT"
       - name: Create Dokku app and database
         env:
           APP: ${{ steps.review.outputs.app }}
@@ -108,10 +109,14 @@ jobs:
           APP: ${{ steps.review.outputs.app }}
           DOMAIN: ${{ steps.review.outputs.domain }}
           DJANGO_SETTINGS_MODULE: ${{ vars.DJANGO_SETTINGS_MODULE || '{{project_name}}.settings' }}
+          AWS_S3_ACCESS_KEY_ID: ${{ secrets.AWS_S3_ACCESS_KEY_ID }}
+          AWS_S3_SECRET_ACCESS_KEY: ${{ secrets.AWS_S3_SECRET_ACCESS_KEY }}
+          AWS_S3_ENDPOINT_URL: ${{secrets.AWS_S3_ENDPOINT_URL }}
+          AWS_STORAGE_BUCKET_NAME: ${{ steps.review.outputs.bucket_name }}
         run: |
           SSH="ssh -i ~/.ssh/dokku_key -p $DOKKU_SSH_PORT -o StrictHostKeyChecking=yes"
           $SSH "$DOKKU_USER@$DOKKU_HOST" "domains:set '$APP' '$DOMAIN'"
-          $SSH "$DOKKU_USER@$DOKKU_HOST" "config:set '$APP' DJANGO_SETTINGS_MODULE='$DJANGO_SETTINGS_MODULE' SECRET_KEY='$SECRET_KEY' DEBUG='$DEBUG' ALLOWED_HOSTS='$DOMAIN' CSRF_TRUSTED_ORIGINS='https://*.$BASE_DOMAIN' "
+          $SSH "$DOKKU_USER@$DOKKU_HOST" "config:set '$APP' DJANGO_SETTINGS_MODULE='$DJANGO_SETTINGS_MODULE' SECRET_KEY='$SECRET_KEY' DEBUG='$DEBUG' ALLOWED_HOSTS='$DOMAIN' CSRF_TRUSTED_ORIGINS='https://*.$BASE_DOMAIN' AWS_S3_ACCESS_KEY_ID='$AWS_S3_ACCESS_KEY_ID' AWS_S3_SECRET_ACCESS_KEY='$AWS_S3_SECRET_ACCESS_KEY' AWS_S3_ENDPOINT_URL='$AWS_S3_ENDPOINT_URL' AWS_STORAGE_BUCKET_NAME='$AWS_STORAGE_BUCKET_NAME' "
           $SSH "$DOKKU_USER@$DOKKU_HOST" "config:set --no-restart '$APP' PR_NUMBER='${{ github.event.pull_request.number }}' PR_SHA='${{ github.event.pull_request.head.sha }}'"
       - name: Deploy PR to Dokku
         env:
@@ -130,6 +135,11 @@ jobs:
           APP: ${{ steps.review.outputs.app }}
         run: |
           ssh -i ~/.ssh/dokku_key -p "$DOKKU_SSH_PORT" -o StrictHostKeyChecking=yes "$DOKKU_USER@$DOKKU_HOST" "run '$APP' python manage.py loaddata seeds.json"
+      - name: Create Assets Bucket
+        env:
+          APP: ${{ steps.review.outputs.app }}
+        run: |
+          ssh -i ~/.ssh/dokku_key -p "$DOKKU_SSH_PORT" -o StrictHostKeyChecking=yes "$DOKKU_USER@$DOKKU_HOST" "run '$APP' python manage.py create_bucket"
       - name: Enable HTTPS
         env:
           APP: ${{ steps.review.outputs.app }}
