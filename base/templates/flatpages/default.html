@@ -1,6 +1,8 @@
 {% load static %}
 {% load django_htmx %}
+
 {% load flatpages %}
+
 {% get_flatpages as flatpages %}
 
 <!DOCTYPE html>
@@ -11,9 +13,7 @@
     <link rel="stylesheet" href="{% static 'vendor/bulma/css/bulma.min.css' %}" />
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
     <title>
-      {% block title %}
-
-      {% endblock %}
+      {{ page.title }}
     </title>
     {% block css %}
 
@@ -30,14 +30,14 @@
 
         <section class="section">
         <div class="container">
-            {% block content %}
-    
-            {% endblock %}
+            <article class="content">
+                {{ flatpage.content|safe }}
+            </article>
         </div>
         </section>
-
-    </main>
     
+    </main>
+        
     {% include "flatpages/flatpages.html" %}
 
     <script src="{% static 'js/bulma.js' %}"></script>

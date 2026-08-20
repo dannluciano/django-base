@@ -52,11 +52,14 @@ INSTALLED_APPS = [
     "django_htmx",
     "crispy_forms",
     "crispy_bulma",
+    "django_prose_editor",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django.contrib.sites",
+    "django.contrib.flatpages",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
 ]
@@ -311,6 +314,8 @@ MESSAGE_TAGS = {
     messages.WARNING: "is-warning",
     messages.ERROR: "is-danger",
 }
+
+SITE_ID = 1
 
 if DEBUG:
     # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
