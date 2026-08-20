@@ -42,9 +42,9 @@ jobs:
           --health-retries 5
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.14.5"
           cache: pip
@@ -127,7 +127,7 @@ jobs:
         run: |
           git remote remove dokku 2>/dev/null || true
           git remote add dokku "ssh://$DOKKU_USER@$DOKKU_HOST:$DOKKU_SSH_PORT/$APP"
-          git push dokku "HEAD:main" --force
+          git push dokku "HEAD:refs/heads/main" --force
       - name: Run migrations
         env:
           APP: ${{ steps.review.outputs.app }}
