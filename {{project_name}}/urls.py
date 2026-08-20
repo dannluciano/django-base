@@ -21,8 +21,8 @@ from django.urls import include, path
 
 urlpatterns = [
     path("", include("core.urls")),
-    path("", include("django.contrib.flatpages.urls")),
     path("admin/", admin.site.urls),
+    path("", include("django.contrib.flatpages.urls")),
 ]
 
 if settings.DEBUG:
