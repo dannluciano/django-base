@@ -1,0 +1,49 @@
+name: Setup Dokku SSH
+description: Configure SSH credentials and helper commands for Dokku.
+
+inputs:
+  ssh-key:
+    description: Private SSH key used to connect to Dokku.
+    required: true
+  known-hosts:
+    description: Known hosts entries for the Dokku server.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Configure SSH
+      shell: bash
+      env:
+        DOKKU_SSH_KEY: ${{ inputs.ssh-key }}
+        DOKKU_KNOWN_HOSTS: ${{ inputs.known-hosts }}
+      run: |
+        SSH_DIR="$HOME/.ssh"
+        SSH_KEY_PATH="$SSH_DIR/dokku_key"
+        BIN_DIR="$RUNNER_TEMP/dokku-bin"
+
+        mkdir -p "$SSH_DIR" "$BIN_DIR"
+        chmod 700 "$SSH_DIR"
+        printf '%s\n' "$DOKKU_SSH_KEY" > "$SSH_KEY_PATH"
+        chmod 600 "$SSH_KEY_PATH"
+        printf '%s\n' "$DOKKU_KNOWN_HOSTS" > "$SSH_DIR/known_hosts"
+        chmod 644 "$SSH_DIR/known_hosts"
+
+        cat > "$BIN_DIR/dokku-ssh" <<'EOF'
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        exec ssh \
+          -i "$DOKKU_SSH_KEY_PATH" \
+          -p "$DOKKU_SSH_PORT" \
+          -o StrictHostKeyChecking=yes \
+          "$DOKKU_USER@$DOKKU_HOST" \
+          "$@"
+        EOF
+        chmod +x "$BIN_DIR/dokku-ssh"
+
+        {
+          echo "DOKKU_SSH_KEY_PATH=$SSH_KEY_PATH"
+          echo "GIT_SSH_COMMAND=ssh -i $SSH_KEY_PATH -o StrictHostKeyChecking=yes"
+        } >> "$GITHUB_ENV"
+        echo "$BIN_DIR" >> "$GITHUB_PATH"
