@@ -1,4 +1,4 @@
-name: CI-Preview
+name: CI-Review
 
 on:
   pull_request:
@@ -23,7 +23,7 @@ env:
 
 jobs:
   ci:
-    name: Django CI
+    name: Continuos Integration
     if: github.event.action != 'closed'
     runs-on: ubuntu-latest
     services:
@@ -43,6 +43,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - name: Setup Python
         uses: actions/setup-python@v7
         with:
@@ -77,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout PR
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Configure SSH
@@ -108,7 +110,7 @@ jobs:
           if ! dokku-ssh "postgres:linked '$DB' '$APP'"; then
             dokku-ssh "postgres:link '$DB' '$APP'"
           fi
-      - name: Configure Django/Dokku
+      - name: Configure Dokku App
         env:
           APP: ${{ steps.review.outputs.app }}
           DOMAIN: ${{ steps.review.outputs.domain }}
@@ -128,12 +130,12 @@ jobs:
           git remote remove dokku 2>/dev/null || true
           git remote add dokku "ssh://$DOKKU_USER@$DOKKU_HOST:$DOKKU_SSH_PORT/$APP"
           git push dokku "HEAD:refs/heads/main" --force
-      - name: Run migrations
+      - name: Run Migrations
         env:
           APP: ${{ steps.review.outputs.app }}
         run: |
           dokku-ssh "run '$APP' python manage.py migrate --noinput"
-      - name: Load data from seeds
+      - name: Load Data From Seeds
         env:
           APP: ${{ steps.review.outputs.app }}
         run: |
@@ -160,7 +162,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - name: Configure SSH
         uses: ./.github/actions/setup-dokku-ssh
         with:
