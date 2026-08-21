@@ -1,0 +1,20 @@
+---
+name: 'Deploy'
+
+on:
+  workflow_dispatch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cloning repo
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Push to dokku
+        uses: dokku/github-action@master
+        with:
+          git_remote_url: 'ssh://dokku@base.dannluciano.com.br:22/django-base'
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
